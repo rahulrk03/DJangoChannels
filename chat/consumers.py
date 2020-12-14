@@ -3,6 +3,10 @@ import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from .models import Message
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
 
 class ChatConsumer(WebsocketConsumer):
     def fetch_messages(self, data):
@@ -10,11 +14,18 @@ class ChatConsumer(WebsocketConsumer):
         content = {
                 'messages': self.messages_to_json(messages)
         }
-        self.send_chat_message(content)
+        self.send_message(content)
 
     def new_message(self, data):
-        print('new_message')
-        pass
+        author = data["from"]
+        author_user = User.objects.filter(username=author)[0]
+        message = Message.objects.create(author=author_user,
+                                         content=data["message"])
+        content = {
+                'command': 'new_message',
+                'message': self.message_to_json(message)
+        }
+        return self.send_chat_message(content)
 
     def messages_to_json(self, messages):
         result = []
@@ -68,11 +79,12 @@ class ChatConsumer(WebsocketConsumer):
             }
         )
 
+    def send_message(self, message):
+        self.send(text_data=json.dumps(message))
     # Receive message from room group
+
     def chat_message(self, event):
         message = event['message']
 
         # Send message to WebSocket
-        self.send(text_data=json.dumps({
-            'message': message
-        }))
+        self.send(text_data=json.dumps(message))
