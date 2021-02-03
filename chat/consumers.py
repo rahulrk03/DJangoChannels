@@ -21,6 +21,8 @@ class ChatConsumer(WebsocketConsumer):
         author_user = User.objects.filter(username=author)[0]
         message = Message.objects.create(author=author_user,
                                          content=data["message"])
+        print("hello")
+        print(data)
         content = {
                 'command': 'new_message',
                 'message': self.message_to_json(message)
@@ -80,6 +82,8 @@ class ChatConsumer(WebsocketConsumer):
         )
 
     def send_message(self, message):
+        print("hello there")
+        print(message)
         self.send(text_data=json.dumps(message))
     # Receive message from room group
 

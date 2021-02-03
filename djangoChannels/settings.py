@@ -123,7 +123,7 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
-ASGI_APPLICATION = 'djangoChannels.routing.application'
+# ASGI_APPLICATION = 'djangoChannels.routing.application'
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
